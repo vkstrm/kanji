@@ -1,66 +1,51 @@
 use clap::{ArgMatches};
 
-mod types;
-mod repository;
+mod dictionary;
+mod kana;
+mod printer;
 
-pub fn interpret_commands(matches: &ArgMatches) {
-    let input: &str;
-    match matches.value_of("input") {
-        Some(i) => input = i,
-        None => {
-            println!("Missing input");
-            return
-        }
-    }
-
-    match matches.occurrences_of("meaning") {
-        1 => query::meaning(input),
-        _ => {} 
-    }
-
-    match matches.occurrences_of("onyomi") {
-        1 => query::onyomi(input),
-        _ => {} 
-    }
-
-    match matches.occurrences_of("kunyomi") {
-        1 => query::kunyomi(input),
-        _ => {} 
-    }
-
-    match matches.occurrences_of("kanji") {
-        1 => query::kanji(input),
-        _ => {}
-    }
-
-    match matches.occurrences_of("verbose") {
-        1 => println!("Something should happen I guess"),
-        _ => {}
-    }
-
-    query::hiragana(input);
+pub struct Row {
+    pub character: String,
+    pub kunyomi: Vec<String>,
+    pub onyomi: Vec<String>,
+    pub meaning: Vec<String>
 }
 
-mod query {
-    use crate::repository;
-
-    pub fn meaning(input: &str) {
-        match repository::query_kanji_meaning(&String::from(input)) {
-            Ok(rows) => {
-                for elem in rows {
-                    println!("{}", elem.character)
-                }
-            },
-            Err(e) => panic!(e)
-        }
+pub fn handle_arguments(matches: &ArgMatches) {
+    match matches.value_of("input") {
+        Some(input) => {
+            match matches.is_present("meaning") {
+                true => {
+                    let rows: Vec<Row>;
+                    if matches.is_present("substring") {
+                        rows = dictionary::by_meaning_substring(input);
+                    } else {
+                        rows = dictionary::by_meaning(input);
+                    }
+                    printer::print(&rows);
+                }, _ => {}
+            }
+            match matches.is_present("onyomi") {
+                true => {
+                    let rows = dictionary::by_onyomi(input);
+                    printer::print(&rows);
+                }, _ => {}
+            }
+            match matches.is_present("kunyomi") {
+                true => {
+                    let rows = dictionary::by_kunyomi(input);
+                    printer::print(&rows);
+                }, _ => {}
+            }
+            match matches.is_present("kanji") {
+                true => {
+                    let rows = dictionary::by_character(input);
+                    printer::print(&rows);
+                }, _ => {}
+            }
         
+            // TODO query on both on and kun and get distinct result back
+        }
+        None => {}
     }
-
-    pub fn onyomi(input: &str) {}
-
-    pub fn kunyomi(input: &str) {}
-
-    pub fn hiragana(input: &str) {}
-
-    pub fn kanji(input: &str){}
 }

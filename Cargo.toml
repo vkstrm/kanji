@@ -1,5 +1,5 @@
 [package]
-name = "kandb"
+name = "kanji"
 version = "0.1.0"
 authors = ["vkstrm"]
 edition = "2018"
