@@ -3,6 +3,7 @@ use clap::{ArgMatches};
 mod dictionary;
 mod kana;
 mod printer;
+mod custom_error;
 
 pub struct Row {
     pub character: String,
@@ -16,36 +17,53 @@ pub fn handle_arguments(matches: &ArgMatches) {
         Some(input) => {
             match matches.is_present("meaning") {
                 true => {
-                    let rows: Vec<Row>;
                     if matches.is_present("substring") {
-                        rows = dictionary::by_meaning_substring(input);
+                        match dictionary::by_meaning_substring(input) {
+                            Ok(rows) => printer::print(&rows),
+                            Err(why) => match_error(why)
+                        }
                     } else {
-                        rows = dictionary::by_meaning(input);
+                        match dictionary::by_meaning(input) {
+                            Ok(rows) => printer::print(&rows),
+                            Err(why) => match_error(why)
+                        }
                     }
-                    printer::print(&rows);
                 }, _ => {}
             }
             match matches.is_present("onyomi") {
                 true => {
-                    let rows = dictionary::by_onyomi(input);
-                    printer::print(&rows);
+                    match dictionary::by_onyomi(input) {
+                        Ok(rows) => printer::print(&rows),
+                        Err(why) => match_error(why)
+                    }
                 }, _ => {}
             }
             match matches.is_present("kunyomi") {
                 true => {
-                    let rows = dictionary::by_kunyomi(input);
-                    printer::print(&rows);
+                    match dictionary::by_kunyomi(input) {
+                        Ok(rows) => printer::print(&rows),
+                        Err(why) => match_error(why)
+                    }
                 }, _ => {}
             }
             match matches.is_present("kanji") {
                 true => {
-                    let rows = dictionary::by_character(input);
-                    printer::print(&rows);
+                    match dictionary::by_character(input) {
+                       Ok(rows) => printer::print(&rows),
+                       Err(why) => match_error(why)
+                    }
                 }, _ => {}
             }
         
             // TODO query on both on and kun and get distinct result back
         }
         None => {}
+    }
+}
+
+fn match_error(error: custom_error::Error) {
+    match error.kind() {
+        custom_error::Kind::ConnectionError => eprintln!("Error connecting to database: {}", error.message()),
+        custom_error::Kind::RepositoryError => eprintln!("Error querying database: {}", error.message())
     }
 }
