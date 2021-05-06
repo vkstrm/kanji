@@ -7,8 +7,18 @@ pub struct Error {
 }
 
 impl Error {
-    pub fn new(kind: Kind, message: String) -> Error {
-        Error { kind, message }
+    pub fn new_connection_error(message: String) -> Error {
+        Error { 
+            kind: Kind::ConnectionError, 
+            message 
+        }
+    }
+
+    pub fn new_repository_error(message: String) -> Error {
+        Error { 
+            kind: Kind::RepositoryError, 
+            message 
+        }
     }
 
     pub fn message(&self) -> &String {

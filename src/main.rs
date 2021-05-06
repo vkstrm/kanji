@@ -5,7 +5,7 @@ use kanji;
 fn main() {
     let matches = App::new("kanji")
         .version("1.0")
-        .about("Search for Kanji on the command line")
+        .about("Lookup Kanji meaning and readings")
         .arg(
             Arg::with_name("input")
                 .about("Input to search for")

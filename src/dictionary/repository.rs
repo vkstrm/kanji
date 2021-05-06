@@ -3,7 +3,6 @@ use rusqlite::{Connection};
 
 use crate::kana;
 use crate::custom_error::Error;
-use crate::custom_error;
 
 pub struct RowDto {
     pub character: String,
@@ -29,17 +28,17 @@ pub fn query_kunyomi(kana: &kana::Hiragana) -> Result<Vec<RowDto>, Error> {
 }
 
 fn database_path() -> Result<String, Error> {
-    env::var("DB_PATH").map_err(|why| Error::new(custom_error::Kind::ConnectionError, why.to_string()))
+    env::var("DB_PATH").map_err(|why| Error::new_connection_error(why.to_string()))
 }
 
 fn get_connection() -> Result<Connection, Error>  {
     let path = database_path()?;
-    Connection::open(&path).map_err(|why| Error::new(custom_error::Kind::ConnectionError, why.to_string()))
+    Connection::open(&path).map_err(|why| Error::new_connection_error(why.to_string()))
 }
 
 fn query_map(sql: &String, format: &String) -> Result<Vec<RowDto>, Error> {
     let conn = get_connection()?;
-    let mut stmt = conn.prepare(sql.as_str()).map_err(|why| Error::new(custom_error::Kind::RepositoryError, why.to_string()))?;
+    let mut stmt = conn.prepare(sql.as_str()).map_err(|why| Error::new_connection_error(why.to_string()))?;
 
     let iter = stmt.query_map_named(&[(sql::PARAM, &format)], |row| {
         Ok(RowDto {
@@ -48,7 +47,7 @@ fn query_map(sql: &String, format: &String) -> Result<Vec<RowDto>, Error> {
             onyomi: row.get(2)?,
             meaning: row.get(3)?
         })
-    }).map_err(|why| Error::new(custom_error::Kind::RepositoryError, why.to_string()))?;
+    }).map_err(|why| Error::new_repository_error(why.to_string()))?;
 
     Ok(iter.map(|i| i.unwrap()).collect())
 }
