@@ -1,7 +1,7 @@
 use std::env;
 use rusqlite::{Connection};
 
-use crate::kana;
+use crate::kana::{Katakana, Hiragana};
 use crate::custom_error::Error;
 
 pub struct RowDto {
@@ -19,12 +19,12 @@ pub fn query_meaning(value: &String) -> Result<Vec<RowDto>, Error> {
     query_map(&sql::meaning(), &sql::format_like(value))
 }
 
-pub fn query_onyomi(kana: &kana::Katakana) -> Result<Vec<RowDto>, Error> {
-    query_map(&sql::onyomi(), &sql::format_like(&kana.word))
+pub fn query_onyomi(kana: &Katakana) -> Result<Vec<RowDto>, Error> {
+    query_map(&sql::onyomi(), &sql::format_like(kana))
 }
 
-pub fn query_kunyomi(kana: &kana::Hiragana) -> Result<Vec<RowDto>, Error> {
-    query_map(&sql::kunyomi(), &sql::format_like(&kana.word))
+pub fn query_kunyomi(kana: &Hiragana) -> Result<Vec<RowDto>, Error> {
+    query_map(&sql::kunyomi(), &sql::format_like(kana))
 }
 
 fn database_path() -> Result<String, Error> {

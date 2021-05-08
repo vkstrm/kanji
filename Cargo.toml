@@ -12,3 +12,6 @@ version = "3.0.0-beta.1"
 [dependencies.rusqlite]
 version = "0.23.1"
 features = ["bundled"]
+
+[dependencies.prettytable-rs]
+version = "^0.8"
