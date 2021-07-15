@@ -13,6 +13,18 @@ pub struct Row {
 }
 
 pub fn handle_arguments(matches: &ArgMatches) {
+    match matches.subcommand() {
+        Some(("kanji", args)) => {
+            handle_kanji(&args);
+        },
+        Some(("kana", args)) => {
+            handle_kana(&args);
+        },
+        _ => {}
+    }
+}
+
+fn handle_kanji(matches: &clap::ArgMatches) {
     match matches.value_of("input") {
         Some(input) => {
             match matches.is_present("meaning") {
@@ -61,9 +73,30 @@ pub fn handle_arguments(matches: &ArgMatches) {
     }
 }
 
+fn handle_kana(args: &clap::ArgMatches) {
+    if let Some(input) = args.value_of("input") {
+        if args.is_present("katakana") {
+            match kana::str_to_katakana(input) {
+                Ok(katakana) => {
+                    println!("{}", katakana);
+                },
+                Err(why) => match_error(why)
+            }
+        } else {
+            match kana::str_to_hiragana(input) {
+                Ok(hiragana) => {
+                    println!("{}", hiragana);
+                },
+                Err(why) => match_error(why)
+            }
+        }
+    }
+}
+
 fn match_error(error: custom_error::Error) {
     match error.kind() {
         custom_error::Kind::ConnectionError => eprintln!("Error connecting to database: {}", error.message()),
-        custom_error::Kind::RepositoryError => eprintln!("Error querying database: {}", error.message())
+        custom_error::Kind::RepositoryError => eprintln!("Error querying database: {}", error.message()),
+        custom_error::Kind::KanaError => eprintln!("Error transforming kana: {}", error.message())
     }
 }

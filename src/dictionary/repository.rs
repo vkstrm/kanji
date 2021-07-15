@@ -40,7 +40,7 @@ fn query_map(sql: &String, format: &String) -> Result<Vec<RowDto>, Error> {
     let conn = get_connection()?;
     let mut stmt = conn.prepare(sql.as_str()).map_err(|why| Error::new_connection_error(why.to_string()))?;
 
-    let iter = stmt.query_map_named(&[(sql::PARAM, &format)], |row| {
+    let iter = stmt.query_map(&[(sql::PARAM, &format)], |row| {
         Ok(RowDto {
             character: row.get(0)?,
             kunyomi: row.get(1)?,

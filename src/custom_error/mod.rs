@@ -21,6 +21,13 @@ impl Error {
         }
     }
 
+    pub fn new_kana_error(message: String) -> Error {
+        Error {
+            kind: Kind::KanaError,
+            message
+        }
+    }
+
     pub fn message(&self) -> &String {
         &self.message
     }
@@ -34,6 +41,7 @@ impl Error {
 pub enum Kind {
     ConnectionError,
     RepositoryError,
+    KanaError,
 }
 
 impl std::error::Error for Error {
@@ -41,6 +49,7 @@ impl std::error::Error for Error {
         match self.kind {
             Kind::ConnectionError => "Error connecting to database",
             Kind::RepositoryError => "Error querying database", 
+            Kind::KanaError => "Error transforming kana",
         }
     }
 }
@@ -50,6 +59,7 @@ impl fmt::Display for Error {
         match self.kind {
             Kind::ConnectionError => write!(f, "{}", self.message()),
             Kind::RepositoryError => write!(f, "{}", self.message()),
+            Kind::KanaError => write!(f, "{}", self.message()),
         }   
     }
 }

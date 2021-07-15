@@ -20,13 +20,13 @@ pub fn by_meaning_substring(input: &str) -> Result<Vec<Row>, custom_error::Error
 }
 
 pub fn by_onyomi(input: &str) -> Result<Vec<Row>, custom_error::Error> {
-    let kana = kana::str_to_katakana(input);
+    let kana = kana::str_to_katakana(input)?;
     let dtos = repository::query_onyomi(&kana)?;
     Ok(collect_rows(dtos))
 }
 
 pub fn by_kunyomi(input: &str) -> Result<Vec<Row>, custom_error::Error> {
-    let kana = kana::str_to_hiragana(input);
+    let kana = kana::str_to_hiragana(input)?;
     let dtos = repository::query_kunyomi(&kana)?;
     Ok(collect_rows(dtos))
 }
